@@ -1,0 +1,236 @@
+<style>
+
+body {
+  counter-reset: question_num;                     /* Set a counter named 'section', and it`s initial value is 0. */
+}
+
+/* Question Box */
+.Q {
+    background-color:#ff9900;
+    color:black;
+    font-size:17px;
+    width:100%;
+    border:1px solid #666666;
+    padding:5px;
+}
+
+.Q::before {
+    counter-increment: question_num;
+    content: "QUESTION " counter(question_num) '\A';
+    white-space: pre;
+}
+
+.qhelp {
+    color:#666666;
+    font-size:15px
+}
+
+.qhelp::after {
+    content: "Answer this question in the corresponding Brightspace LAB quiz"
+}
+
+
+
+/* code */
+.rendered_html pre, .rendered_html code {
+    font-family: "SF Mono","Segoe UI Mono","Roboto Mono","Ubuntu Mono",Menlo,Courier,monospace;
+    padding: 1px 3px;
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background: #e6e6e6;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #0052CC;
+}
+
+
+/* Copy to CONSOLE */
+.c2c {
+    background-color:#d2d2d2;
+    color:#ff8080;
+    font-size:13px;
+    border:1px solid #bfbfbf;
+    padding:1px 3px;
+    border-radius: 3px;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.c2c::before {
+    content: "Copy-paste into Spyder's Console";
+}
+
+
+/* RUN */
+.run {
+    background-color:#d2d2d2;
+    color:#00b300;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: bold;
+    border:1px solid #bfbfbf;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+}
+.run::before {
+    content: "\25B6" "RUN";
+}
+
+/* RUN */
+.runcell {
+    background-color:#d2d2d2;
+    color:#00b300;
+    font-size: 12px;
+    line-height: 1.4;
+    border:1px solid #bfbfbf;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+}
+.runcell::before {
+    content: "RUN current cell";
+}
+
+/* FILE */
+.file {
+    color:#b36b00;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: bold;
+    border:1px solid #bfbfbf;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* important */
+.important {
+    background-color:#ff4d4d;
+    color:black;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: bold;
+    border:1px solid #bfbfbf;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top:5px;
+}
+.important::before {
+    content: "Important:";
+}
+
+/* important */
+.note {
+    background-color:#ffff80;
+    color:black;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: bold;
+    border:1px solid #bfbfbf;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top:5px;
+}
+.note::before {
+    content: "Note:";
+}
+
+/* checkpoint */
+.checkpoint {
+    background-color:yellow;
+    color:blue;
+    font-size: 15px;
+    line-height: 1.4;
+    font-weight: bold;
+    border:1px solid #bfbfbf;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top:5px;
+}
+
+.codeerror {
+    background-color:#ffb3b3;
+    color:red;
+    font-size: 13px;
+    line-height: 1.4;
+    border:1px solid #ffb3b3;
+    padding-top:7px;
+    padding-bottom:7px;
+    padding-left:7px;
+    padding-right:7px;
+    border-radius: 3px;
+    margin:20px;
+    margin-left:25px;
+}
+
+.lineerror {
+    background-color:#ffb3b3;
+    color:red;
+    font-size: 13px;
+    line-height: 1.4;
+    border:1px solid #ffb3b3;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top:5px;
+}
+
+
+/* terminal */
+.terminal {
+    background-color:black;
+    color:white;
+    font-size: 12px;
+    line-height: 1.4;
+    border:1px solid black;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:3px;
+    padding-right:3px;
+    border-radius: 3px;
+    display: inline-block;
+}
+.terminal::before {
+    content: "Terminal (i.e. Anaconda Promt)";
+}
+.terminalBlock {
+    background-color:black;
+    color:white;
+    font-size: 14px;
+    line-height: 1.4;
+    border:1px solid black;
+    padding-top:7px;
+    padding-bottom:7px;
+    padding-left:7px;
+    padding-right:7px;
+    border-radius: 3px;
+    margin:20px;
+    margin-left:25px;
+}
+
+</style>
