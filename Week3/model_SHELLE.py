@@ -125,7 +125,7 @@ def run(days, dt, par, InitCond):
     output['L_Oxy'] = L_Oxy
     output['L_Food'] = L_Food 
     
-    print "Model run: DONE!!!"
+    print('Model run: DONE!!!')
     return  output
 
 def plot(output):
