@@ -6,9 +6,13 @@ def load_defaults():
     
     # Parameters
     par = {}
+    par['mZ']=1
+    # EXAMPLE: par['mu'] = 1
     
     # Initial conditions
     InitCond = {}
+    # EXAMPLE: InitCond['P'] = 1
+    
     return  days, dt, par, InitCond
     
 def run(days, dt, par, InitCond):
@@ -21,14 +25,29 @@ def run(days, dt, par, InitCond):
     time = np.linspace(0,days,NoSTEPS) # Makes vector array of equally spaced numbers 
     
     # Create arrays of zeros
+    # EXAMPLE: P = np.zeros((NoSTEPS), float)
+    Z = np.zeros((NoSTEPS), float)
     
     # Initializing with initial conditions
+    # EXAMPLE: P[0] = InitCond['P']
+    Z[0] = 1 #Todo later
     
     # *****************************************************************************
     # MAIN MODEL LOOP *************************************************************
     for t in range(0,NoSTEPS-1):
+        # Estimate limiting functions
+        
+        #Estimate processes
         a = 0 #DUMMY LINE
-        # Update and step ------------------------------
+        
+        #Estimate Time rate of change of all State Variables (dXdt) ----
+        #EXAMPLE: dPdt = 0
+        dZdt = -par['mZ']* Z[t]
+        
+        # Update and step (time-stepping) ------------------------------
+        # EXAMPLE: P[t+1] = P[t] + (dPdt * dt)
+        Z[t+1] = Z[t] + (dZdt * dt)
+        
     # end of main model LOOP*******************************************************
     # *****************************************************************************
 
