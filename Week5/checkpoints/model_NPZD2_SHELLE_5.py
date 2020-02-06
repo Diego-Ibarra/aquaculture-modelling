@@ -20,6 +20,7 @@ def load_defaults():
     
     # Parameters
     par = {}
+    # NPZD2
     par['mu0']   = 0.69  
     par['kNO3']  = 0.5    
     par['kNH4']  = 0.5  
@@ -38,8 +39,31 @@ def load_defaults():
     par['nmax']  = 0.05
     par['kI']    = 0.1
     par['I0']    = 0.0095
+    # SHELLE
+    par['AE_P']    = 0.9  
+    par['AE_D']    = 0.2    
+    par['AE_Z']    = 0.3  
+    par['Bpub']    = 0.43  
+    par['Fmax_ref'] = 0.025
+    par['GT']       = 0.44
+    par['KTempH']   = 0.1    
+    par['KTempL']   = 0.5 
+    par['KSaltL']   = 0.25
+    par['KOxyL']    = 0.02 
+    par['KFood']    = 1.    
+    par['KRE']   = 0.86
+    par['OxyL']  = 17.5
+    par['Rm']    = 0.002
+    par['SaltL'] = 10.
+    par['TempH'] = 25.
+    par['TempL'] = -4.
+    par['beta']  = 0.12
+    par['epsilonP'] = 1.
+    par['epsilonD'] = 0.5
+    par['epsilonZ'] = 0.3
     
     # Initial conditions
+    #NDPZD2
     InitCond = {}
     InitCond['Phy']  = 0.2
     InitCond['Zoo']  = 0.1
@@ -48,7 +72,11 @@ def load_defaults():
     InitCond['NH4']  = 0.1
     InitCond['NO3']  = 7.
     InitCond['Temp'] = 6.
-    #InitCond['O2'] = 0.5 
+    # SHELLE
+    InitCond['Soma'] = 0.01
+    InitCond['Gonad'] = 0.
+    InitCond['Salt'] = 30. #Salinity
+    InitCond['Oxy'] = 30. #Oxygen
     return days, dt, par, InitCond
     
 
@@ -68,6 +96,7 @@ def run(days,dt,InitCond,par):
     time = np.linspace(0,days,NoSTEPS) # Makes and vector array of equally spaced numbers from zero to "days"
     
     # Create zero-vectors
+    # NPZD2
     Phy = np.zeros((NoSTEPS,),float) # makes a vector array of zeros (size: NoSTEPS rows by ONE column)
     Zoo = np.zeros((NoSTEPS,),float) # same as above
     SDet = np.zeros((NoSTEPS,),float) # Biomass - same as above 
@@ -82,6 +111,20 @@ def run(days,dt,InitCond,par):
     L_NH4 = np.zeros((NoSTEPS,),float) # same as above
     TotN = np.zeros((NoSTEPS,),float) # same as above
 
+    # SHELLE
+    Soma = np.zeros((NoSTEPS,),float) # makes a vector array of zeros (size: NoSTEPS rows by ONE column)
+    Gonad = np.zeros((NoSTEPS,),float) # same as above
+    B = np.zeros((NoSTEPS,),float) # Biomass - same as above 
+    L_Temp = np.zeros((NoSTEPS,),float) # same as above
+    L_Salt = np.zeros((NoSTEPS,),float) # same as above
+    L_Oxy = np.zeros((NoSTEPS,),float) # same as above
+    L_Food = np.zeros((NoSTEPS,),float) # same as above
+    F = np.zeros((NoSTEPS,),float) # same as above
+    A = np.zeros((NoSTEPS,),float) # same as above
+    R = np.zeros((NoSTEPS,),float) # same as above
+    RE = np.zeros((NoSTEPS,),float) # same as above
+    Spawning = np.zeros((NoSTEPS,),float) # same as above
+
     
     # Creating sunlight
     for i in range(len(I)):
@@ -93,6 +136,7 @@ def run(days,dt,InitCond,par):
     
     
     # Initializing with initial conditions
+    # NPZD2
     Phy[0] = InitCond['Phy']
     Zoo[0] = InitCond['Zoo']
     SDet[0] = InitCond['SDet']
@@ -104,6 +148,14 @@ def run(days,dt,InitCond,par):
     TotN[0] = Phy[0] + Zoo[0] + SDet[0] + LDet[0] + NH4[0] + NO3[0]
     
     Temp = np.ones((NoSTEPS,),float) * InitCond['Temp'] #Temperature
+    
+    # SHELLE
+    Soma[0] = InitCond['Soma']
+    Gonad[0] = InitCond['Soma']
+    B[0] = InitCond['Soma'] + InitCond['Gonad']
+    Spawning[0] = 0.
+    Salt = np.ones((NoSTEPS,),float) * InitCond['Salt']#Salinity
+    Oxy = np.ones((NoSTEPS,),float) * InitCond['Oxy'] #Oxygen
     
     
     
@@ -156,6 +208,7 @@ def run(days,dt,InitCond,par):
                   
     
         # Update and step ----------------------------------------------------
+        # NPZD2
         Phy[t+1]  = Phy[t]  + (dPhydt * dt)
         Zoo[t+1]  = Zoo[t]  + (dZoodt * dt)
         SDet[t+1] = SDet[t] + (dSDetdt * dt)
@@ -166,6 +219,11 @@ def run(days,dt,InitCond,par):
             offset = NO3[t+1]
             NH4[t+1] = NH4[t+1] + offset
             NO3[t+1] = NO3[t+1] - offset
+        
+        # SHELLE
+        Soma[t+1] = Soma[t] + (dSomadt * dt)
+        Gonad[t+1] = Gonad[t] + (dGonaddt * dt)  - Spawning[t]
+        B[t+1] = Soma[t+1] + Gonad[t+1]
             
         # Estimate Total Nitrogen
         TotN[t+1] = Phy[t+1] + Zoo[t+1] + SDet[t+1] + LDet[t+1] + NH4[t+1] + NO3[t+1]
