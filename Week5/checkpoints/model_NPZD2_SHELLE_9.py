@@ -266,7 +266,7 @@ def run(days,dt,InitCond,par):
         B[t+1] = Soma[t+1] + Gonad[t+1]
             
         # Estimate Total Nitrogen
-        TotN[t+1] = Phy[t+1] + Zoo[t+1] + SDet[t+1] + LDet[t+1] + NH4[t+1] + NO3[t+1] + B[t+1]
+        TotN[t+1] = Phy[t+1] + Zoo[t+1] + SDet[t+1] + LDet[t+1] + NH4[t+1] + NO3[t+1] + B[t+1] # <<< THIS CHANGED <<<
     # end of main model LOOP*******************************************************
     # *****************************************************************************
 
@@ -324,10 +324,10 @@ def plot(output):
     ax2.plot(output['time']/365,output['NH4'],'m-')
     ax2.plot(output['time']/365,output['NO3'],'c-')
     ax2.plot(output['time']/365,output['TotN'],'y-')
-    ax2.plot(output['time']/365,output['B'],'r.')  # <<<<<<<<<<<<<<<<<<<<<<<<< THIS IS NEW <<<<<<<<<<<<<<<<<
+    ax2.plot(output['time']/365,output['B'],'r.')
     ax2.set_xlabel('Time (years)')
     ax2.set_ylabel('Nitrogen (mmol N m$^{-3}$)')
-    plt.legend(['Phy','Zoo','SDet','LDet','NH4','NO3','TotN','B']) # <<<<<<<<< THIS CHANGED <<<<<<<<<<<<<<<<
+    plt.legend(['Phy','Zoo','SDet','LDet','NH4','NO3','TotN','B'])
     plt.show()
     return
     

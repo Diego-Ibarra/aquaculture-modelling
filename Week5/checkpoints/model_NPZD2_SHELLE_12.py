@@ -242,7 +242,7 @@ def run(days,dt,InitCond,par):
             Spawning[t] = Gonad[t]
             dGonaddt = 0.
             dSomadt = A[t]-R[t]
-            Zoo[t] =  Zoo[t] + Spawning[t] # <<<<<<<<<<<<<<<<<<<<<<<<<<< NEW LINE !!! <<<<<<<<<<<<<<<
+            Zoo[t] =  Zoo[t] + Spawning[t]
         else:
             dGonaddt = 0.
             dSomadt = 0.   
@@ -353,10 +353,10 @@ def plot(output):
     ax2.plot(output['time']/365,output['NH4'],'m-')
     ax2.plot(output['time']/365,output['NO3'],'c-')
     ax2.plot(output['time']/365,output['TotN'],'y-')
-    ax2.plot(output['time']/365,output['B'],'r.')  # <<<<<<<<<<<<<<<<<<<<<<<<< THIS IS NEW <<<<<<<<<<<<<<<<<
+    ax2.plot(output['time']/365,output['B'],'r.')  
     ax2.set_xlabel('Time (years)')
     ax2.set_ylabel('Nitrogen (mmol N m$^{-3}$)')
-    plt.legend(['Phy','Zoo','SDet','LDet','NH4','NO3','TotN','B']) # <<<<<<<<< THIS CHANGED <<<<<<<<<<<<<<<<
+    plt.legend(['Phy','Zoo','SDet','LDet','NH4','NO3','TotN','B']) 
     plt.show()
     return
     
