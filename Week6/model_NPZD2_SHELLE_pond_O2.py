@@ -25,6 +25,9 @@ def load_defaults():
     par['Y'] = 1. # Basin width
     par['Z'] = 1. # Basin depth
     par['V'] = par['X'] * par['Y'] * par['Z']
+    # Other physical parameters (for Oxygen exchange with Atmosphere)
+    par['uwind'] = 0.01
+    par['vwind'] = 0.01
     # NPZD2
     par['mu0']   = 0.69  
     par['kNO3']  = 0.5    
@@ -135,7 +138,7 @@ def run(days,dt,InitCond,par):
     Spawning = np.zeros((NoSTEPS,),float) # same as above  
     n_muss = np.zeros((NoSTEPS,),float) # same as above
     B_total = np.zeros((NoSTEPS,),float) # Total Biomass of mussels in Embayment 
-
+    airwater_O2_flux = np.zeros((NoSTEPS,),float) # same as above
     
     # Creating sunlight
     for i in range(len(I)):
@@ -186,7 +189,9 @@ def run(days,dt,InitCond,par):
         g = par['gmax'] * (Phy[t]**2/(par['kP']+(Phy[t]**2)))
         
         n = par['nmax'] * (1 - max(0,(I[t]-par['I0'])/(par['kI']+I[t]-par['I0'])))
-    
+
+        n_O2 = (Oxy[t]/(3.+Oxy[t]))
+
         dPhydt = (mu[t] * Phy[t]) - \
                  (g  * Zoo[t]) - \
                  (par['mP'] * Phy[t]) - \
@@ -207,10 +212,10 @@ def run(days,dt,InitCond,par):
                   (par['rLD']*LDet[t])
                   
         dNO3dt = -(muMax * f_I[t] * L_NO3[t] * Phy[t]) + \
-                  (n * NH4[t])
+                  (n * n_O2 * NH4[t])
                  
         dNH4dt = -(muMax * f_I[t] * L_NH4[t] * Phy[t]) - \
-                  (n * NH4[t]) + \
+                  (n * n_O2 * NH4[t]) + \
                   (par['lBM'] * Zoo[t]) + \
                   (par['lE']*((Phy[t]**2)/(par['kP']+(Phy[t]**2)))*par['beta']*Zoo[t]) + \
                   (par['rSD']*SDet[t]) + \
@@ -276,12 +281,81 @@ def run(days,dt,InitCond,par):
         # Population dynamics of mussels
         dn_mussdt = 0
     
+    
+        # Oxygen sub-model =========================================
+        
+        # Parameters
+        OA0 = 2.00907       # Oxygen
+        OA1 = 3.22014       # saturation
+        OA2 = 4.05010       # coefficients
+        OA3 = 4.94457
+        OA4 =-0.256847
+        OA5 = 3.88767
+        OB0 =-0.00624523
+        OB1 =-0.00737614
+        OB2 =-0.0103410
+        OB3 =-0.00817083
+        OC0 =-0.000000488682
+        rOxNO3= 8.625       # 138/16
+        rOxNH4= 6.625       # 106/16
+        l2mol = 1000.0/22.9316 # liter to mol
+        
+        #-----------------------------------------------------------------------
+        #  Surface O2 gas exchange.
+        #-----------------------------------------------------------------------
+        
+        #  Compute surface O2 gas exchange.
+        cff2=0.31*(24.0/100.0)
+        
+        #  Compute O2 transfer velocity : u10squared (u10 in m/s)
+        u10squ=(par['uwind']*par['uwind'])+(par['vwind']*par['vwind'])
+        
+        # Calculate the Schmidt number for O2 in sea water (Wanninkhof, 1992).
+        SchmidtN_Ox=1953.4-Temp[t]*(128.0-Temp[t]*(3.9918-Temp[t]*0.050091))
+        cff3=cff2*u10squ*np.sqrt(660.0/SchmidtN_Ox)        
+        
+        #  Calculate O2 saturation concentration using Garcia and Gordon
+        #  L&O (1992) formula, (EXP(AA) is in ml/l).        
+        TS=np.log((298.15-Temp[t])/(273.15+Temp[t]))        
+        
+        AA=OA0+TS*(OA1+TS*(OA2+TS*(OA3+TS*(OA4+TS*OA5))))+ \
+           Salt[t]*(OB0+TS*(OB1+TS*(OB2+TS*OB3)))+ \
+           OC0*Salt[t]*Salt[t]
+        
+        # Convert from ml/l to mmol/m3.
+        O2satu=l2mol*np.exp(AA)        
+        
+        # Add in O2 gas exchange.
+        O2_Flux = cff3*(O2satu-Oxy[t])
+        
+        airwater_O2_flux[t] = O2_Flux * (1./par['Z'])
+        
+        dOxydt = airwater_O2_flux[t]
+        
+        
+        # Production via Photosynthesys
+        dOxydt = dOxydt + (muMax * f_I[t] * L_NO3[t] * Phy[t] * rOxNO3) # New production
+        dOxydt = dOxydt + (muMax * f_I[t] * L_NH4[t] * Phy[t] * rOxNH4) # Regenerated production
+        
+        # Respiration
+        dOxydt = dOxydt - (((par['lBM']*Zoo[t]) - \
+                           (par['lE']*((Phy[t]**2)/(par['kP']+(Phy[t]**2)))*par['beta']*Zoo[t]) - \
+                           (par['mZ']*(Zoo[t]**2))) * rOxNH4) # Zooplankton
+ 
+        dOxydt = dOxydt - ((n * n_O2 * NH4[t])* rOxNH4 * 2) # Nitrification 
+ 
+        dOxydt = dOxydt - (((par['rSD']*SDet[t])+(par['rLD']*LDet[t])) * rOxNH4) #S and L Detritus remineralization
+        
+        dOxydt = dOxydt - (((R[t]*n_muss[t])/par['V']) * rOxNH4)  #Respiration by mussels    
+    
+    
         # Update and step ----------------------------------------------------
         # NPZD2
         Phy[t+1]  = Phy[t]  + (dPhydt * dt)
         Zoo[t+1]  = Zoo[t]  + (dZoodt * dt)
         SDet[t+1] = SDet[t] + (dSDetdt * dt)
         LDet[t+1] = LDet[t] + (dLDetdt * dt)
+        Oxy[t+1]  = max(0,Oxy[t] +  (dOxydt * dt))
         NH4[t+1]  = NH4[t]  + (dNH4dt * dt)
         NO3[t+1]  = NO3[t]  + (dNO3dt * dt)
         if NO3[t+1] <= 0.0001:
@@ -335,9 +409,11 @@ def run(days,dt,InitCond,par):
     output['L_Food'] = L_Food 
     output['B_total'] = B_total
     output['n_muss'] = n_muss
+    output['Oxy'] = Oxy
+    output['L_Oxy'] = L_Oxy
 
 
-    print "Model run: DONE!!!"
+    print('Model run: DONE!!!')
     return output
 
 

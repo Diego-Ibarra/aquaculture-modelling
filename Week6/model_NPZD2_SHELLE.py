@@ -311,7 +311,7 @@ def run(days,dt,InitCond,par):
     output['Salt'] = Salt
 
 
-    print "Model run: DONE!!!"
+    print('Model run: DONE!!!')
     return output
 
 
