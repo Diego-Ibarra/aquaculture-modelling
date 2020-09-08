@@ -169,6 +169,21 @@ body {
     content: "Note:";
 }
 
+
+.nomenclature {
+    font-family: "SF Mono","Segoe UI Mono","Roboto Mono","Ubuntu Mono",Menlo,Courier,monospace;
+    background-color:#ffff80;
+    color:black;
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: bold;
+    border:1px solid #bfbfbf;
+    padding:15px;
+    display: inline-block;
+    margin-top:5px;
+}
+
+
 /* checkpoint */
 .checkpoint {
     background-color:yellow;
