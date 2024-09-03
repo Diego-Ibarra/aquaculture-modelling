@@ -18528,7 +18528,8 @@ dtype: float64</pre>
     <td><img src="./otn200.png" width="500px">Current deployment</td>
   </tr>
 </table><p>The code below pulls data from a glider currently deployed off the coast of Nova Scotia (<a href="http://gliders.oceantrack.org/">http://gliders.oceantrack.org/</a>). The code also does a simple quality control and makes a rough depth-vs-time scatter plot.</p>
-<p>In <strong><em>Spyder</em></strong> open a new file, name it <span class="file">glider.py</span>, copy-paste the code below and click <span class="run"></span>.</p>
+<p>Make sure you download the data file <span class="file">glider_data.csv</span> and you save it in your working directory.</p>
+<p>In <strong><em>Spyder</em></strong> open a new file, name it <span class="file">glider.py</span> (make sure it is also in your working directory), then copy-paste the code below and click <span class="run"></span>.</p>
 
 </div>
 </div>
@@ -18544,14 +18545,14 @@ dtype: float64</pre>
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import Pandas module</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="c1"># Define URL of glider</span>
-<span class="n">URL</span> <span class="o">=</span> <span class="s1">'http://gliders.oceantrack.org/data/live/otn201_sci_water_temp_live.csv'</span>
-
-<span class="c1"># Read data from glider server</span>
-<span class="n">glider_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s1">','</span><span class="p">)</span>
+<span class="c1"># Read data from file</span>
+<span class="n">glider_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'glider_data.csv'</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s1">','</span><span class="p">)</span>
 
 <span class="c1"># Quality Control: Filter out data above 40oC and below -8oC</span>
 <span class="n">glider_data</span> <span class="o">=</span> <span class="n">glider_data</span><span class="p">[(</span><span class="n">glider_data</span><span class="o">.</span><span class="n">sci_water_temp</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">glider_data</span><span class="o">.</span><span class="n">sci_water_temp</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">8</span><span class="p">)]</span>
+
+<span class="c1"># Quality Control: Filter out data too close to the surface</span>
+<span class="n">glider_data</span> <span class="o">=</span> <span class="n">glider_data</span><span class="p">[</span><span class="n">glider_data</span><span class="o">.</span><span class="n">depth</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">]</span>
 
 <span class="c1"># Make a scatter plot</span>
 <span class="n">glider_data</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="s1">'unixtime'</span><span class="p">,</span>
